@@ -1,0 +1,16 @@
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+ul li {
+    text-align: center;
+}
+ul li input{
+    text-align: center;
+    width: 90vw;
+    height: 50px;
+    margin-bottom: 15px;
+    font-size: 35px;
+    color: black;
+}
