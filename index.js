@@ -70,17 +70,16 @@ function updateBackgroundColor(event) {
 
 function initColors() {
     var defaultColorList = [
-        "#DA291C",
-        "#2B303A",
-        "#92DCE5",
-        "#EEE5E9",
-        "#7C7C7C"
+        "DA291C",
+        "2B303A",
+        "92DCE5",
+        "EEE5E9",
+        "7C7C7C"
     ];
 
-    var inputElements = document.getElementsByClassName("hexInput");
-    for (var i = 0; i < inputElements.length; i++) {
-        inputElements[i].style.background = defaultColorList[i];
-    }
+    defaultColorList.forEach( function(color) {
+        createNewInput(color);
+    })
 }
 
 function saveColors() {
@@ -102,6 +101,8 @@ function restoreColors() {
                 createNewInput(storedColors[i]);
             }
         }
+    } else {
+        initColors();
     }
 }
 
