@@ -1,109 +1,136 @@
-function convertHex(hex) {
-    hex = hex.replace("#", "");
-    r = parseInt(hex.substring(0, 2), 16);
-    g = parseInt(hex.substring(2, 4), 16);
-    b = parseInt(hex.substring(4, 6), 16);
+var LOCAL_STORAGE_KEY = "hextorgb_colorstore";
+var OUTPUT_LIST_ID = "outputlist";
+var TEXT_ANCHOR_ID = "textAnchor";
+var LIST_ITEM_CLASS = "list-group-item";
 
-    result = "rgb(" + r + "," + g + "," + b + ")";
-    return result;
-}
 
-function invertColor(hexTripletColor) {
-    var color = hexTripletColor;
-    color = color.substring(1); // remove #
+/**
+ * Store function like converting hex to rgb etc
+ * @constructor
+ */
+var Helper = function () {
+    this.regex = /#(?:[A-Za-z0-9]{6})/m;
+};
+Helper.prototype.isHexValue = function (hex_value) {
+    return this.regex.exec(hex_value);
+};
+Helper.prototype.convertToRGBString = function (hex_value) {
+    hex_value = hex_value.replace("#", "");
+    var r = parseInt(hex_value.substring(0, 2), 16);
+    var g = parseInt(hex_value.substring(2, 4), 16);
+    var b = parseInt(hex_value.substring(4, 6), 16);
+    return "rgb(" + r + "," + g + "," + b + "),";
+};
+Helper.prototype.invertHexColor = function (hex_color) {
+    var color = hex_color;
+    color = color.replace("#", "");
     color = parseInt(color, 16); // convert to integer
     color = 0x00ff00 ^ color; // invert three bytes
     color = color.toString(16); // convert to hex
     color = ("000000" + color).slice(-6); // pad with leading zeros
     color = "#" + color; // prepend #
     return color;
-}
-
-function convert() {
-    var colorArray = [];
-    var colorString = "";
-    var inputList = document.getElementsByClassName("hexInput");
-    for (var i = 0; i < inputList.length; i++) {
-        if (inputList[i].value !== "") {
-            // colorArray.push(convertHex("#"+inputList[i].value));
-            colorString += convertHex("#" + inputList[i].value) + ";";
-        }
-    }
-    document.getElementById("result").innerHTML = colorString;
-    console.log(colorString);
-}
-
-function createNewInput(color) {
-    console.log("Create new input");
-    var inputList = document.getElementById("inputList");
-    var newListElement = document.createElement("li");
-    newListElement.classList = "inputListItem";
-
-    var newInputElement = document.createElement("input");
-    newInputElement.setAttribute("type", "text");
-    newInputElement.setAttribute("onChange", "updateBackgroundColor(event)");
-    newInputElement.classList = "hexInput";
-    if (color) {
-        newInputElement.value = color;
-        newInputElement.style.background = "#" + color;
+};
+Helper.prototype.appendListitem = function (hex_text) {
+    var list = document.getElementById(OUTPUT_LIST_ID);
+    if (!list) {
+        return;
     }
 
-    var deleteInputButton = document.createElement("button");
-    deleteInputButton.innerText = "X";
-    deleteInputButton.setAttribute("onClick", "removeInputElement(event)");
+    var listItem = document.createElement("li");
+    hex_text = hex_text.replace("#", "");
+    listItem.innerText = hex_text;
+    listItem.value = hex_text;
+    listItem.setAttribute("class", LIST_ITEM_CLASS);
+    listItem.setAttribute("style", "background-color: " + "#" + hex_text);
 
-    newListElement.appendChild(newInputElement);
-    newListElement.appendChild(deleteInputButton);
-    inputList.appendChild(newListElement);
-}
+    list.appendChild(listItem);
+};
 
-function removeInputElement(mouseEventInfo) {
-    var inputList = document.getElementById("inputList");
-    inputList.removeChild(mouseEventInfo.srcElement.parentElement);
-    
-}
 
-function updateBackgroundColor(event) {
-    var newBackgroundColor = "#" + event.srcElement.value;
-    event.srcElement.style.background = newBackgroundColor;
-}
-
-function initColors() {
-    var defaultColorList = [
-        "DA291C",
-        "2B303A",
-        "92DCE5",
-        "EEE5E9",
-        "7C7C7C"
+/**
+ * Handle store and restore of color data
+ * @constructor
+ */
+var ColorStore = function () {
+    this.helper = new Helper();
+    this.colors = [];
+};
+ColorStore.prototype.initializeColors = function () {
+    this.colors = [
+        "#FF0000",
+        "#00FF00",
+        "#0000FF"
     ];
+    this.colors.forEach(function (value) {
+        this.helper.appendListitem(value);
+    });
+};
+ColorStore.prototype.saveColor = function (hex_colorCode) {
+    var shouldStore = true;
+    this.colors.forEach(function (value) {
+        if (value === hex_colorCode) {
+            shouldStore = false;
+        }
+    });
 
-    defaultColorList.forEach( function(color) {
-        createNewInput(color);
-    })
-}
-
-function saveColors() {
-    var currentColors = [];
-    var currentInputs = document.getElementsByClassName("hexInput");
-    for (var i = 0; i < currentInputs.length; i++) {
-        currentColors.push(currentInputs[i].value);
+    if (shouldStore) {
+        this.colors.push(hex_colorCode);
+        helper.appendListitem(hex_colorCode);
     }
-    window.localStorage.setItem("colors", currentColors);
+};
+ColorStore.prototype.storeColor = function () {
+    window.localStorage.setItem(LOCAL_STORAGE_KEY, this.colors);
+};
+ColorStore.prototype.restoreColors = function () {
+    this.colors = window.localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (!this.colors || this.colors.length === 0) {
+        this.initializeColors();
+        return;
+    }
+
+    this.colors = this.colors.split(",");
+    this.colors.forEach(function (value) {
+        if (this.helper.isHexValue(value)) {
+            this.helper.appendListitem(value);
+        }
+    });
+};
+
+
+// Globally needed or they are overridden everytime an input occures
+var helper = new Helper();
+var colorstore = new ColorStore();
+
+/**
+ * Runs when the user fill the input field
+ * @param input The value of the input field
+ */
+function handleColorInputUpdate(input) {
+    if (input.indexOf("#") < 0) {
+        input = "#" + input;
+    }
+
+    if (!helper.isHexValue(input)) {
+        return;
+    }
+    colorstore.saveColor(input);
 }
 
 function restoreColors() {
-    var storedColors = window.localStorage.getItem("colors");
-    if (storedColors !== "" && storedColors !== null) {
-        var storedColors = storedColors.split(",");
-        console.log(storedColors);
-        if (storedColors.length > 0) {
-            for (var i = 0; i < storedColors.length; i++) {
-                createNewInput(storedColors[i]);
-            }
-        }
-    } else {
-        initColors();
-    }
+    colorstore.restoreColors();
+}
+
+function convertToRgbString() {
+    var string_rgbValues = "";
+    colorstore.colors.forEach(function (value) {
+        string_rgbValues += helper.convertToRGBString(value);
+    });
+    document.getElementById(TEXT_ANCHOR_ID).innerText = string_rgbValues;
+}
+
+function saveColors() {
+    colorstore.storeColor();
 }
 
 restoreColors();
