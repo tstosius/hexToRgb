@@ -2,3 +2,19 @@
     max-height: 90vh;
     overflow-y: scroll;
 }
+p {
+    word-break: break-word;
+}
+#outputlist .input-group {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.btn.btn-outline-secondary {
+    background-repeat: no-repeat;
+    background-size: auto;
+    background-position-y: center;
+}
+.row {
+    margin-left: 0;
+    margin-right: 0;
+}

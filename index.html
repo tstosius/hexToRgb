@@ -9,25 +9,23 @@
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-<div class="container">
+<div class="container-flex">
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-4">
             <div class="input-group">
                 <div class="input-group-prepend">
                     <span class="input-group-text" id="basic-addon1">HEX</span>
                 </div>
                 <input id="colorInput" type="text" class="form-control" placeholder="RGB value to convert" onchange="handleColorInputUpdate(this.value)">
             </div>
-            <button type="button" class="btn btn-dark" onClick="createNewInput()">Append Input</button>
             <button type="button" class="btn btn-info" onClick="convertToRgbString()">Convert</button>
             <button type="button" class="btn btn-success" onClick="saveColors()">Save colors</button>
-        </div>
-        <div class="col-sm-6">
-            <ul id="outputlist" class="list-group list-group-flush">
-            </ul>
-        </div>
-        <div class="col-sm-12">
+            <button type="button" class="btn btn-success" onClick="restoreColors()">Restore colors</button>
             <div id="textAnchor"></div>
+        </div>
+        <div class="col-sm-8">
+            <div id="outputlist">
+            </div>
         </div>
     </div>
 </div>

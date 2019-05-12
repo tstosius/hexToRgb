@@ -1,7 +1,9 @@
 var LOCAL_STORAGE_KEY = "hextorgb_colorstore";
 var OUTPUT_LIST_ID = "outputlist";
 var TEXT_ANCHOR_ID = "textAnchor";
-var LIST_ITEM_CLASS = "list-group-item";
+var LIST_ITEM_CLASS = "input-group";
+var INNER_ITEM_CLASS = "input-group-prepend";
+var FORM_ITEM_CLASS = "form-control";
 
 
 /**
@@ -37,14 +39,36 @@ Helper.prototype.appendListitem = function (hex_text) {
         return;
     }
 
-    var listItem = document.createElement("li");
-    hex_text = hex_text.replace("#", "");
+    // Create outer wrapper for all group element
+    var listWrapper = document.createElement("div");
+    listWrapper.setAttribute("class", LIST_ITEM_CLASS);
+    listWrapper.setAttribute("id", hex_text);
+
+    // Create prepend wrapper
+    var prependWrapper = document.createElement("div");
+    prependWrapper.setAttribute("class", INNER_ITEM_CLASS);
+
+    var btn = document.createElement("button");
+    btn.setAttribute("class", "btn btn-outline-secondary");
+    btn.setAttribute("type", "button");
+    btn.addEventListener("click", function () {
+        document.getElementById(hex_text).remove();
+        window.colorstore.colors = window.colorstore.colors.filter(function (value) { return value !== hex_text })
+    });
+
+    btn.setAttribute("style", 'background-image: url("trash.svg")');
+    prependWrapper.appendChild(btn);
+
+
+    var listItem = document.createElement("input");
     listItem.innerText = hex_text;
     listItem.value = hex_text;
-    listItem.setAttribute("class", LIST_ITEM_CLASS);
-    listItem.setAttribute("style", "background-color: " + "#" + hex_text);
+    listItem.setAttribute("class", FORM_ITEM_CLASS);
+    listItem.setAttribute("style", "background-color: " + hex_text);
 
-    list.appendChild(listItem);
+    listWrapper.appendChild(prependWrapper);
+    listWrapper.appendChild(listItem);
+    list.appendChild(listWrapper);
 };
 
 
@@ -126,11 +150,10 @@ function convertToRgbString() {
     colorstore.colors.forEach(function (value) {
         string_rgbValues += helper.convertToRGBString(value);
     });
-    document.getElementById(TEXT_ANCHOR_ID).innerText = string_rgbValues;
+    document.getElementById(TEXT_ANCHOR_ID).innerHTML = "<p>"+string_rgbValues+"</p>";
 }
 
 function saveColors() {
     colorstore.storeColor();
 }
 
-restoreColors();
