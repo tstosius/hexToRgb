@@ -21,7 +21,7 @@ Helper.prototype.convertToRGBString = function (hex_value) {
     var r = parseInt(hex_value.substring(0, 2), 16);
     var g = parseInt(hex_value.substring(2, 4), 16);
     var b = parseInt(hex_value.substring(4, 6), 16);
-    return "rgb(" + r + "," + g + "," + b + "),";
+    return "rgb(" + r + "," + g + "," + b + ");";
 };
 Helper.prototype.invertHexColor = function (hex_color) {
     var color = hex_color;
