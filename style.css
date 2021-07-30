@@ -1,20 +1,103 @@
-#outputlist{
-    max-height: 90vh;
+.no-list-style {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.input-no-border {
+    border-style: none;
+}
+.button {
+    border-style: none;
+    padding: 10px;
+    border-radius: 7px;
+    margin: 10px;
+    cursor: pointer;
+}
+.alert {
+    background-color: #e63946;
+    color: white;
+}
+.alert:hover {
+    background-color: #661a20;
+    color: white;
+}
+.info{
+    background-color: #ffd166;
+    color: white;
+}
+.info:hover {
+    background-color: #866d33;
+    color: white;
+}
+.save{
+    background-color: #0ead69;
+    color: white;
+}
+.save:hover {
+    background-color: #094b2e;
+    color: white;
+}
+
+/* GRID */
+#gridWrapper {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: 100%;
+}
+
+#gridWrapper #inputWrapper {
+    grid-column: 1;
+    position: relative;
+}
+#gridWrapper #inputWrapper #textAnchor {
+    line-break: anywhere;
+}
+#gridWrapper #inputWrapper #hexValueInput {
+    height: 50px;
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+}
+#gridWrapper #inputWrapper #restore {
+    position: absolute;
+    right: 0;
+}
+
+
+
+
+/* Right Side */
+#gridWrapper #colorListWrapper {
+    grid-column: 2;
+    max-height: 95vh;
     overflow-y: scroll;
 }
-p {
-    word-break: break-word;
+#gridWrapper #colorListWrapper #outputlist {
+    display: grid;
+    grid-template-columns: 30% 30% 30%;
 }
-#outputlist .input-group {
-    margin-top: 10px;
-    margin-bottom: 10px;
+#gridWrapper #colorListWrapper #outputlist .colorListItem {
+    display: flex;
+    align-items: flex-end;
+    height: 30px;
+    padding: 5px;
 }
-.btn.btn-outline-secondary {
-    background-repeat: no-repeat;
-    background-size: auto;
-    background-position-y: center;
+#gridWrapper #colorListWrapper #outputlist .colorListItem input{
+    background-color: #878782;
+    height: inherit;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    padding-right: 10px;
+    text-align: right;
 }
-.row {
-    margin-left: 0;
-    margin-right: 0;
+
+#gridWrapper #colorListWrapper #outputlist .colorListItem .input-group-prepend{
+    height: inherit;
 }
+#gridWrapper #colorListWrapper #outputlist .colorListItem .input-group-prepend img{
+    height: inherit;
+    margin: 0;
+    padding: 0;
+}
+

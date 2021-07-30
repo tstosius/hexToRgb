@@ -1,9 +1,9 @@
 var LOCAL_STORAGE_KEY = "hextorgb_colorstore";
 var OUTPUT_LIST_ID = "outputlist";
 var TEXT_ANCHOR_ID = "textAnchor";
-var LIST_ITEM_CLASS = "input-group";
+var LIST_ITEM_CLASS = "colorListItem";
 var INNER_ITEM_CLASS = "input-group-prepend";
-var FORM_ITEM_CLASS = "form-control";
+var FORM_ITEM_CLASS = "input-no-border";
 
 
 /**
@@ -40,7 +40,7 @@ Helper.prototype.appendListitem = function (hex_text) {
     }
 
     // Create outer wrapper for all group element
-    var listWrapper = document.createElement("div");
+    var listWrapper = document.createElement("li");
     listWrapper.setAttribute("class", LIST_ITEM_CLASS);
     listWrapper.setAttribute("id", hex_text);
 
@@ -48,21 +48,19 @@ Helper.prototype.appendListitem = function (hex_text) {
     var prependWrapper = document.createElement("div");
     prependWrapper.setAttribute("class", INNER_ITEM_CLASS);
 
-    var btn = document.createElement("button");
-    btn.setAttribute("class", "btn btn-outline-secondary");
-    btn.setAttribute("type", "button");
+    var btn = document.createElement("img");
+    btn.setAttribute("class", "btn");
     btn.addEventListener("click", function () {
         document.getElementById(hex_text).remove();
         window.colorstore.colors = window.colorstore.colors.filter(function (value) { return value !== hex_text })
     });
 
-    btn.setAttribute("style", 'background-image: url("trash.svg")');
+    btn.setAttribute("src", 'trash.svg');
     prependWrapper.appendChild(btn);
 
 
     var listItem = document.createElement("input");
-    listItem.innerText = hex_text;
-    listItem.value = hex_text;
+
     listItem.setAttribute("class", FORM_ITEM_CLASS);
     listItem.setAttribute("style", "background-color: " + hex_text);
 
@@ -70,6 +68,9 @@ Helper.prototype.appendListitem = function (hex_text) {
     listWrapper.appendChild(listItem);
     list.appendChild(listWrapper);
 };
+Helper.prototype.clearColorList = function() {
+    document.querySelectorAll(".colorListItem").forEach(listitem => listitem.remove())
+}
 
 
 /**
@@ -92,13 +93,8 @@ ColorStore.prototype.initializeColors = function () {
 };
 ColorStore.prototype.saveColor = function (hex_colorCode) {
     var shouldStore = true;
-    this.colors.forEach(function (value) {
-        if (value === hex_colorCode) {
-            shouldStore = false;
-        }
-    });
 
-    if (shouldStore) {
+    if (!this.colors.includes(hex_colorCode)) {
         this.colors.push(hex_colorCode);
         helper.appendListitem(hex_colorCode);
     }
@@ -106,19 +102,19 @@ ColorStore.prototype.saveColor = function (hex_colorCode) {
 ColorStore.prototype.storeColor = function () {
     window.localStorage.setItem(LOCAL_STORAGE_KEY, this.colors);
 };
+
 ColorStore.prototype.restoreColors = function () {
     this.colors = window.localStorage.getItem(LOCAL_STORAGE_KEY);
     if (!this.colors || this.colors.length === 0) {
         this.initializeColors();
-        return;
+        return this.colors;
     }
 
     this.colors = this.colors.split(",");
     this.colors.forEach(function (value) {
-        if (this.helper.isHexValue(value)) {
-            this.helper.appendListitem(value);
-        }
+        this.helper.appendListitem(value);
     });
+    return this.colors;
 };
 
 
@@ -131,6 +127,17 @@ var colorstore = new ColorStore();
  * @param input The value of the input field
  */
 function handleColorInputUpdate(input) {
+
+    document.querySelector("#hexValueInput").value = "";
+
+    if(input.indexOf("https://coolors.co/") === 0){
+        let inputSplit = input.split(/([a-f0-9]{6})/g).filter((val) => val !== "-" && val !== "" && val !== "https://coolors.co/");
+        inputSplit = inputSplit.map( val => "#" + val)
+        inputSplit = inputSplit.filter( val => helper.isHexValue(val))
+        inputSplit.forEach(val => colorstore.saveColor(val))
+        return;
+    }
+
     if (input.indexOf("#") < 0) {
         input = "#" + input;
     }
@@ -139,9 +146,11 @@ function handleColorInputUpdate(input) {
         return;
     }
     colorstore.saveColor(input);
+
 }
 
 function restoreColors() {
+    this.helper.clearColorList();
     colorstore.restoreColors();
 }
 
@@ -155,5 +164,10 @@ function convertToRgbString() {
 
 function saveColors() {
     colorstore.storeColor();
+}
+
+function clearAllColors() {
+    this.helper.clearColorList();
+    colorstore.colors = [];
 }
 
